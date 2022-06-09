@@ -129,6 +129,10 @@ namespace cg::renderer
 				vertex.y = (-vertex.y + 1.f) * height / 2.f;
 			}
 
+			float edge = edge_function(float2{vertices[0].x, vertices[0].y},
+									   float2{vertices[1].x, vertices[1].y},
+									   float2{vertices[2].x, vertices[2].y});
+
 			float2 bounded_box_begin{
 					std::clamp(
 							std::min(std::min(vertices[0].x, vertices[1].x), vertices[2].x),
@@ -165,8 +169,17 @@ namespace cg::renderer
 												point);
 					if (edge0 >= 0.f && edge1 >= 0.f && edge2 >= 0.f)
 					{
-						auto pixel_result = pixel_shader(vertices[0], 0.f);
-						render_target->item(x, y) = RT::from_color(pixel_result);
+						float u = edge1 / edge;
+						float v = edge2 / edge;
+						float w = edge0 / edge;
+						float depth = u*vertices[0].z + v*vertices[1].z + w*vertices[2].z;
+						if (depth_test(depth, x, y))
+						{
+							auto pixel_result = pixel_shader(vertices[0], depth);
+							render_target->item(x, y) = RT::from_color(pixel_result);
+							if (depth_buffer)
+								depth_buffer->item(x, y) = depth;
+						}
 					}
 				}
 			}
