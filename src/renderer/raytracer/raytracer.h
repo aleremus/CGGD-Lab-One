@@ -165,7 +165,21 @@ namespace cg::renderer
 			float3 position, float3 direction,
 			float3 right, float3 up, size_t depth, size_t accumulation_num)
 	{
-		// TODO: Lab 2.01. Implement ray_generation and trace_ray method of raytracer class
+		for(int x = 0; x < width; x++)
+		{
+			for(int y = 0; y < height; y++)
+			{
+				float u = (2.f * x) / static_cast<float>(width - 1) - 1.f;
+				float v = (2.f * y) / static_cast<float>(height - 1) - 1.f;
+				u *= static_cast<float>(width) / static_cast<float>(height);
+				float3 ray_direction = direction + u * right - v * up;
+				ray ray(position, ray_direction);
+
+				payload payload  = trace_ray(ray, depth);
+
+				render_target->item(x, y) = RT::from_color(payload.color);
+			}
+		}
 		// TODO: Lab 2.06. Add `history` resource in `raytracer` class
 		// TODO: Lab 2.06. Implement TAA in `ray_generation` method of `raytracer` class
 	}
@@ -174,6 +188,11 @@ namespace cg::renderer
 	inline payload raytracer<VB, RT>::trace_ray(
 			const ray& ray, size_t depth, float max_t, float min_t) const
 	{
+		if( depth == 0 ) return miss_shader(ray);
+
+		depth--;
+
+		return miss_shader(ray);
 		// TODO: Lab 2.01. Implement ray_generation and trace_ray method of raytracer class
 		// TODO: Lab 2.02. Adjust trace_ray method of raytracer class to traverse geometry and call a closest hit shader
 		// TODO: Lab 2.04. Adjust `trace_ray` method of `raytracer` to use `any_hit_shader`
