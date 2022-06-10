@@ -38,6 +38,8 @@ void cg::renderer::ray_tracing_renderer::init()
 	raytracer->set_vertex_buffers(model->get_vertex_buffers());
 	raytracer->set_index_buffers(model->get_index_buffers());
 	// TODO: Lab 2.03. Add light information to lights array of ray_tracing_renderer
+
+	lights.push_back({float3 {0.f, 1.58f, - 0.03f }, float3{0.78f, 0.78f, 0.78f}});
 	// TODO: Lab 2.04. Initialize `shadow_raytracer` in `ray_tracing_renderer`
 }
 
@@ -54,6 +56,28 @@ void cg::renderer::ray_tracing_renderer::render()
 		payload.color = {0.f, 0.f, (ray.direction.y + 1.f) * 0.5f};
 		return payload;
 	};
+
+	raytracer->closest_hit_shader = [&](const ray& ray, payload& payload, const triangle<cg::vertex>& triangle, size_t depth) {
+		float3 position = ray.position + ray.direction * payload.t;
+		float3 normal = normalize(payload.bary.x * triangle.na +
+								  payload.bary.y * triangle.nb +
+								  payload.bary.z * triangle.nc);
+
+
+
+		float3 result_color = triangle.diffuse;
+
+		for(auto& light: lights)
+		{
+			cg::renderer::ray to_light(position, light.position - position);
+
+			result_color = triangle.diffuse * light.color * std::max(dot(normal, to_light.direction), 0.f);
+		}
+		payload.color = cg::color::from_float3(result_color);
+		return payload;
+	};
+
+	raytracer->build_acceleration_structure();
 
 	auto start = std::chrono::high_resolution_clock::now();
 	raytracer->ray_generation(
