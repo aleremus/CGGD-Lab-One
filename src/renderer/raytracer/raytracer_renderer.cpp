@@ -37,15 +37,12 @@ void cg::renderer::ray_tracing_renderer::init()
 	raytracer->set_viewport(settings->width, settings->height);
 	raytracer->set_vertex_buffers(model->get_vertex_buffers());
 	raytracer->set_index_buffers(model->get_index_buffers());
-	// TODO: Lab 2.03. Add light information to lights array of ray_tracing_renderer
 
 	lights.push_back({float3 {0.5f, 1.58f, - 0.03f }, float3{0.78f, 0.78f, 0.78f}});
-	lights.push_back({float3 {-0.5f, 1.58f, - 0.03f }, unsigned_color{125, 54,200}.to_float3()});
-	lights.push_back({float3 {0.f, 1.08f, - 0.03f }, float3{0.1f, 0.98f, 0.58f}});
+	//lights.push_back({float3 {-0.5f, 1.58f, - 0.03f }, unsigned_color{125, 54,200}.to_float3()});
+	//lights.push_back({float3 {0.f, 1.08f, - 0.03f }, float3{0.1f, 0.98f, 0.58f}});
 	shadow_raytracer = std::make_shared<cg::renderer::raytracer<cg::vertex, cg::unsigned_color>>();
-	shadow_raytracer->set_vertex_buffers(model->get_vertex_buffers());
-	shadow_raytracer->set_index_buffers(model->get_index_buffers());
-	// TODO: Lab 2.04. Initialize `shadow_raytracer` in `ray_tracing_renderer`
+
 }
 
 void cg::renderer::ray_tracing_renderer::destroy() {}
@@ -87,7 +84,7 @@ void cg::renderer::ray_tracing_renderer::render()
 	};
 
 	raytracer->build_acceleration_structure();
-	shadow_raytracer->build_acceleration_structure();
+	shadow_raytracer->acceleration_structures = raytracer->acceleration_structures;
 
 	shadow_raytracer->miss_shader = [](const ray& ray)
 	{

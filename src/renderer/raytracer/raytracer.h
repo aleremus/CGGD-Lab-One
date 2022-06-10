@@ -200,6 +200,7 @@ namespace cg::renderer
 	{
 		for(int x = 0; x < width; x++)
 		{
+#pragma omp parallel for
 			for(int y = 0; y < height; y++)
 			{
 				float u = (2.f * x) / static_cast<float>(width - 1) - 1.f;
@@ -231,7 +232,7 @@ namespace cg::renderer
 
 		for(auto& aabb: acceleration_structures)
 		{
-			if(aabb.aabb_test(ray))
+			if(!aabb.aabb_test(ray))
 				continue;
 			for (auto& triangle: aabb.get_triangles())
 			{
@@ -287,7 +288,29 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	float2 raytracer<VB, RT>::get_jitter(int frame_id)
 	{
-		// TODO: Lab 2.06. Implement `get_jitter` method of `raytracer` class
+		float2 result{0.f, 0.f};
+		constexpr int base_x = 2;
+		int index = frame_id +1;
+		float inv_base = 1.f/ base_x;
+		float fraction = inv_base;
+		while(index > 0)
+		{
+			result.x +=(index % base_x) * fraction;
+			index /= base_x;
+			fraction *= inv_base;
+		}
+
+		constexpr int base_y = 3;
+		index = frame_id + 1;
+		inv_base = 1.f /base_y;
+		fraction = inv_base;
+		while (index > 0)
+		{
+			result.y +=(index % base_y) * fraction;
+			index /= base_y;
+			fraction *= inv_base;
+		}
+		return result;
 	}
 
 
