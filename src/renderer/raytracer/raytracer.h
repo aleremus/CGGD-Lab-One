@@ -128,6 +128,8 @@ namespace cg::renderer
 
 		size_t width = 1920;
 		size_t height = 1080;
+
+		int triangles;
 	};
 
 	template<typename VB, typename RT>
@@ -161,6 +163,24 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	inline void raytracer<VB, RT>::build_acceleration_structure()
 	{
+		for(size_t shape_id = 0; shape_id < index_buffers.size(); shape_id++)
+		{
+			auto& index_buffer = index_buffers[shape_id];
+			auto& vertex_buffer = vertex_buffers[shape_id];
+
+			size_t index_id = 0;
+
+			while(index_id < index_buffer->get_number_of_elements())
+			{
+				triangle<VB> triangle{
+							vertex_buffer->item(index_buffer->item(index_id++)),
+							vertex_buffer->item(index_buffer->item(index_id++)),
+							vertex_buffer->item(index_buffer->item(index_id++))
+				};
+
+				triangles.push_back(triangle);
+			}
+		}
 		// TODO: Lab 2.05. Implement build_acceleration_structure method of raytracer class
 	}
 
@@ -215,7 +235,30 @@ namespace cg::renderer
 	inline payload raytracer<VB, RT>::intersection_shader(
 			const triangle<VB>& triangle, const ray& ray) const
 	{
-		// TODO: Lab 2.02. Implement an intersection_shader method of raytracer class
+		payload payload{};
+		payload.t = -1.f;
+
+		float3 pvec = cross(ray.direction, triangle.ca);
+		float det = dot(triangle.ba, pvec);
+		if( det > -1e-8 && det < 1e-8)
+			return payload;
+
+		float inv_det = 1.f/ det;
+		float3 tvec = ray.position - triangle.a;
+		float u = dot(tvec, pvec) * inv_det;
+
+		if(u < 0.f || u > 1.f)
+			return payload;
+
+		float3 qvec = cross(tvec, triangle.ba);
+		float v = dot(ray.direction, qvec) * inv_det;
+
+		if(v < 0.f || u + v > 1.f)
+			return payload;
+
+		payload.t = dot(triangle.ca, qvec) * inv_det;
+		payload.bary = float3(1.f - u - v, u, v);
+		return payload;
 	}
 
 	template<typename VB, typename RT>
