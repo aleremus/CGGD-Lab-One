@@ -137,12 +137,12 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	void raytracer<VB, RT>::set_index_buffers(std::vector<std::shared_ptr<cg::resource<unsigned int>>> in_index_buffers)
 	{
-		// TODO: Lab 2.02. Implement set_vertex_buffers and set_index_buffers of raytracer class
+		index_buffers= in_index_buffers;
 	}
 	template<typename VB, typename RT>
 	inline void raytracer<VB, RT>::set_vertex_buffers(std::vector<std::shared_ptr<cg::resource<VB>>> in_vertex_buffers)
 	{
-		// TODO: Lab 2.02. Implement set_vertex_buffers and set_index_buffers of raytracer class
+		vertex_buffers = in_vertex_buffers;
 	}
 
 	template<typename VB, typename RT>
@@ -193,7 +193,6 @@ namespace cg::renderer
 		depth--;
 
 		return miss_shader(ray);
-		// TODO: Lab 2.01. Implement ray_generation and trace_ray method of raytracer class
 		// TODO: Lab 2.02. Adjust trace_ray method of raytracer class to traverse geometry and call a closest hit shader
 		// TODO: Lab 2.04. Adjust `trace_ray` method of `raytracer` to use `any_hit_shader`
 		// TODO: Lab 2.05. Adjust trace_ray method of raytracer class to traverse the acceleration structure
