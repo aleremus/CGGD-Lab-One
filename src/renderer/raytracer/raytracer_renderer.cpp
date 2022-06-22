@@ -38,9 +38,12 @@ void cg::renderer::ray_tracing_renderer::init()
 	raytracer->set_vertex_buffers(model->get_vertex_buffers());
 	raytracer->set_index_buffers(model->get_index_buffers());
 
-	lights.push_back({float3 {0.5f, 1.58f, - 0.03f }, float3{0.78f, 0.78f, 0.78f}});
-	//lights.push_back({float3 {-0.5f, 1.58f, - 0.03f }, unsigned_color{125, 54,200}.to_float3()});
-	//lights.push_back({float3 {0.f, 1.08f, - 0.03f }, float3{0.1f, 0.98f, 0.58f}});
+	//lights.push_back({float3 {0.f, 1.8f, 0.f }, float3{1.0f, 1.0f, 1.0f}});
+	for (int x = 0; x < 11; ++x) {
+		for (int z = 0; z < 10; ++z) {
+			lights.push_back({float3 {0.23f - 0.04f * static_cast<float>(x), 1.8f, 0.16f - 0.04f * static_cast<float>(z) }, float3{0.01f, 0.01f, 0.01f}});
+		}
+	}
 	shadow_raytracer = std::make_shared<cg::renderer::raytracer<cg::vertex, cg::unsigned_color>>();
 
 }
