@@ -37,13 +37,14 @@ void cg::renderer::ray_tracing_renderer::init()
 	raytracer->set_viewport(settings->width, settings->height);
 	raytracer->set_vertex_buffers(model->get_vertex_buffers());
 	raytracer->set_index_buffers(model->get_index_buffers());
-
-	//lights.push_back({float3 {0.f, 1.8f, 0.f }, float3{1.0f, 1.0f, 1.0f}});
-	for (int x = 0; x < 11; ++x) {
+	if(!settings->smooth_light)
+		lights.push_back({float3 {0.f, 1.8f, 0.f }, float3{1.0f, 1.0f, 1.0f}});
+	else for (int x = 0; x < 11; ++x) {
 		for (int z = 0; z < 10; ++z) {
 			lights.push_back({float3 {0.23f - 0.04f * static_cast<float>(x), 1.8f, 0.16f - 0.04f * static_cast<float>(z) }, float3{0.01f, 0.01f, 0.01f}});
 		}
 	}
+
 	shadow_raytracer = std::make_shared<cg::renderer::raytracer<cg::vertex, cg::unsigned_color>>();
 
 }
@@ -92,7 +93,8 @@ void cg::renderer::ray_tracing_renderer::render()
 						payload_next.color.to_float3() *
 						std::max(dot(normal, to_next_object.direction), 0.f);
 
-		else for(auto& light: lights)
+		else
+			for(auto& light: lights)
 		{
 			cg::renderer::ray to_light(position, light.position - position);
 

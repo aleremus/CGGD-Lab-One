@@ -29,6 +29,7 @@ namespace cg
 		unsigned accumulation_num;
 
 		bool random_raytracer;
+		bool smooth_light;
 	};
 
 }// namespace cg

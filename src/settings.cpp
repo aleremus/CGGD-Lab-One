@@ -26,6 +26,7 @@ std::shared_ptr<settings> cg::settings::parse_settings(int argc, char** argv)
 	add_options("raytracing_depth", "Maximum number of traces rays", cxxopts::value<unsigned>()->default_value("1"));
 	add_options("accumulation_num", "Number of accumulated frames", cxxopts::value<unsigned>()->default_value("1"));
 	add_options("random_raytracer", "Enable of random raytracer 0 - OFF, 1 - ON", cxxopts::value<int>()->default_value("0"));
+	add_options("smooth_light", "Enable long raytracer, but with smooth shadows", cxxopts::value<int>()->default_value("0"));
 	add_options("h,help", "Print usage");
 
 	auto result = options.parse(argc, argv);
@@ -48,6 +49,7 @@ std::shared_ptr<settings> cg::settings::parse_settings(int argc, char** argv)
 	settings->raytracing_depth = result["raytracing_depth"].as<unsigned>();
 	settings->accumulation_num = result["accumulation_num"].as<unsigned>();
 	settings->random_raytracer = result["random_raytracer"].as<int>() != 0;
+	settings->smooth_light = result["smooth_light"].as<int>() != 0;
 
 	return settings;
 }
