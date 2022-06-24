@@ -254,7 +254,11 @@ void cg::renderer::dx12_renderer::create_shader_resource_view(const ComPtr<ID3D1
 
 void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D12Resource>& buffer, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handler)
 {
-	// TODO Lab 3.04. Create a constant buffer view
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc = {};
+	cbv_desc.BufferLocation = buffer->GetGPUVirtualAddress();
+	cbv_desc.SizeInBytes = (sizeof(cb) + 255) & ~255;
+
+	device->CreateConstantBufferView(&cbv_desc, cpu_handler);
 }
 
 void cg::renderer::dx12_renderer::load_assets()
@@ -314,7 +318,8 @@ void cg::renderer::dx12_renderer::load_assets()
 			1,
 			D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
 			);
-	// TODO Lab 3.04. Create a constant buffer view
+
+	create_constant_buffer_view(constant_buffer, cbv_srv_heap.get_cpu_descriptor_handle(0));
 }
 
 
