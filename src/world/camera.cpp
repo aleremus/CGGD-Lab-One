@@ -79,16 +79,19 @@ const float4x4 cg::world::camera::get_view_matrix() const
 #ifdef DX12
 const DirectX::XMMATRIX cg::world::camera::get_dxm_view_matrix() const
 {
+	return DirectX::XMMatrixIdentity();
 	// TODO Lab 3.08. Implement `get_dxm_view_matrix`, `get_dxm_projection_matrix`, and `get_dxm_mvp_matrix` methods of `camera`
 }
 
 const DirectX::XMMATRIX cg::world::camera::get_dxm_projection_matrix() const
 {
+	return DirectX::XMMatrixIdentity();
 	// TODO Lab 3.08. Implement `get_dxm_view_matrix`, `get_dxm_projection_matrix`, and `get_dxm_mvp_matrix` methods of `camera`
 }
 
 const DirectX::XMMATRIX camera::get_dxm_mvp_matrix() const
 {
+	return DirectX::XMMatrixIdentity();
 	// TODO Lab 3.08. Implement `get_dxm_view_matrix`, `get_dxm_projection_matrix`, and `get_dxm_mvp_matrix` methods of `camera`
 }
 #endif
