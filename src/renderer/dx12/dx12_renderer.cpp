@@ -404,7 +404,8 @@ void cg::renderer::dx12_renderer::copy_data(const void* buffer_data, UINT buffer
 
 	UINT8* buffer_data_begin;
 	CD3DX12_RANGE read_range(0, 0);
-	THROW_IF_FAILED(destination_resource->Map(0, &read_range, reinterpret_cast<void**>(buffer_data_begin)));
+	THROW_IF_FAILED(destination_resource->Map(0,
+											  &read_range, reinterpret_cast<void**>(&buffer_data_begin)));
 
 	memcpy(buffer_data_begin, buffer_data, buffer_size);
 	destination_resource->Unmap(0,0);
