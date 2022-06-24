@@ -153,12 +153,22 @@ void cg::renderer::dx12_renderer::create_depth_buffer()
 
 void cg::renderer::dx12_renderer::create_command_allocators()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
+	for(auto& command_allocator: command_allocators)
+	{
+		THROW_IF_FAILED(device->CreateCommandAllocator(
+				D3D12_COMMAND_LIST_TYPE_DIRECT,
+				IID_PPV_ARGS(&command_allocator)));
+	}
 }
 
 void cg::renderer::dx12_renderer::create_command_list()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
+	THROW_IF_FAILED(device->CreateCommandList(
+			0,
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			command_allocators[0].Get(),
+			pipeline_state.Get(),
+			IID_PPV_ARGS(&command_list)));
 }
 
 
@@ -429,6 +439,11 @@ void cg::renderer::dx12_renderer::load_assets()
 {
 	create_root_signature(nullptr, 0);
 	create_pso("shaders.hlsl");
+
+	create_command_allocators();
+	create_command_list();
+	command_list->Close();
+
 	vertex_buffers.resize(model->get_vertex_buffers().size());
 	vertex_buffer_views.resize(model->get_vertex_buffers().size());
 
