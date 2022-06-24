@@ -605,7 +605,23 @@ void cg::renderer::dx12_renderer::populate_command_list()
 
 void cg::renderer::dx12_renderer::move_to_next_frame()
 {
-	// TODO Lab 3.07. Implement `move_to_next_frame` method
+	const UINT64 current_fence_value = fence_values[frame_index];
+
+	THROW_IF_FAILED(command_queue->Signal(
+			fence.Get(),
+			current_fence_value));
+
+	frame_index = swap_chain->GetCurrentBackBufferIndex();
+
+	if(fence->GetCompletedValue() < fence_values[frame_index])
+	{
+		THROW_IF_FAILED(fence->SetEventOnCompletion(
+				fence_values[frame_index],
+				fence_event));
+
+		WaitForSingleObjectEx(fence_event,INFINITE, FALSE);
+	}
+	fence_values[frame_index] = current_fence_value + 1;
 }
 
 void cg::renderer::dx12_renderer::wait_for_gpu()
