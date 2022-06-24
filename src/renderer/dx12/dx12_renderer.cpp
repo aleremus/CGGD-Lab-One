@@ -180,7 +180,60 @@ D3D12_STATIC_SAMPLER_DESC cg::renderer::dx12_renderer::get_sampler_descriptor()
 
 void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPLER_DESC* sampler_descriptors, UINT num_sampler_descriptors)
 {
-	// TODO Lab 3.05. Create a descriptor table and a root signature
+
+	CD3DX12_ROOT_PARAMETER1 root_parameters[1];
+	CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
+
+	ranges[0].Init(
+			D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
+			1,0,0,
+			D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
+
+	root_parameters[0].InitAsDescriptorTable(
+			1, &ranges[0],
+			D3D12_SHADER_VISIBILITY_VERTEX);
+
+	D3D12_FEATURE_DATA_ROOT_SIGNATURE rs_feature_data = {};
+	rs_feature_data.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+
+	if(FAILED(device->CheckFeatureSupport(
+				D3D12_FEATURE_ROOT_SIGNATURE,
+				&rs_feature_data,
+				sizeof(rs_feature_data))))
+	{
+		rs_feature_data.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+	}
+
+	D3D12_ROOT_SIGNATURE_FLAGS rs_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rs_descriptor;
+	rs_descriptor.Init_1_1(
+			_countof(root_parameters),
+			root_parameters,
+			0,nullptr,
+			rs_flags);
+
+	ComPtr<ID3DBlob> signature;
+	ComPtr<ID3DBlob> error;
+
+	HRESULT result = D3DX12SerializeVersionedRootSignature(
+			&rs_descriptor,
+			rs_feature_data.HighestVersion,
+			&signature,
+			&error);
+
+	if(FAILED(result))
+	{
+		OutputDebugStringA((char*)error->GetBufferPointer());
+		THROW_IF_FAILED(result);
+	}
+
+	THROW_IF_FAILED(device->CreateRootSignature(
+			0,
+			signature->GetBufferPointer(),
+			signature->GetBufferSize(),
+			IID_PPV_ARGS(&root_signature)
+			));
 }
 
 std::filesystem::path cg::renderer::dx12_renderer::get_shader_path(const std::string& shader_name)
