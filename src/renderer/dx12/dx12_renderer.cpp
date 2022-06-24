@@ -31,6 +31,16 @@ void cg::renderer::dx12_renderer::init()
 	camera->set_z_near(settings->camera_z_near);
 	camera->set_z_far(settings->camera_z_far);
 
+	view_port = CD3DX12_VIEWPORT(0.f, 0.f,
+								 static_cast<float>(settings->width),
+								 static_cast<float>(settings->height));
+
+	scissor_rect = CD3DX12_RECT(0, 0,
+								static_cast<LONG>(settings->width),
+								static_cast<LONG>(settings->height));
+
+	load_pipeline();
+	load_assets();
 }
 
 void cg::renderer::dx12_renderer::destroy()
@@ -342,7 +352,7 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 					2,
 					DXGI_FORMAT_R32G32B32_FLOAT,
 					0 ,
-					58,
+					56,
 					D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 					0}};
 
@@ -514,7 +524,18 @@ void cg::renderer::dx12_renderer::load_assets()
 void cg::renderer::dx12_renderer::populate_command_list()
 {
 	// TODO Lab 3.06. Implement `populate_command_list` method
+	//RESET
+	THROW_IF_FAILED(command_allocators[frame_index]->Reset());
+	THROW_IF_FAILED(command_list->Reset(
+			command_allocators[frame_index].Get(),
+			pipeline_state.Get()));
 
+	//INITIAL STATE
+	command_list->SetGraphicsRootSignature(root_signature.Get());
+	ID3D12DescriptorHeap* heaps[] = {cbv_srv_heap.get()};
+	command_list->SetDescriptorHeaps(_countof(heaps), heaps);
+	command_list->SetComputeRootDescriptorTable(0, cbv_srv_heap.get_gpu_descriptor_handle(0));
+	command_list->RSSetViewports(1,&view_port);
 }
 
 
