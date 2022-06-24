@@ -427,6 +427,8 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 
 void cg::renderer::dx12_renderer::load_assets()
 {
+	create_root_signature(nullptr, 0);
+	create_pso("shaders.hlsl");
 	vertex_buffers.resize(model->get_vertex_buffers().size());
 	vertex_buffer_views.resize(model->get_vertex_buffers().size());
 
