@@ -21,6 +21,16 @@ g floor
 usemtl floor
 f -4 -3 -2 -1
 
+## Object floor Back
+v  -1.01  0.00   0.99
+v   1.00  0.00   0.99
+v   1.00  0.00  -1.04
+v  -0.99  0.00  -1.04
+
+g floor
+usemtl floor
+f -1 -2 -3 -4
+
 ## Object ceiling 
 v  -1.02  1.99   0.99  
 v  -1.02  1.99  -1.04
@@ -31,8 +41,18 @@ g ceiling
 usemtl ceiling
 f -4 -3 -2 -1
 
-## Object backwall  
-v  -0.99  0.00  -1.04 
+## Object ceiling Back
+v  -1.02  1.99   0.99
+v  -1.02  1.99  -1.04
+v   1.00  1.99  -1.04
+v   1.00  1.99   0.99
+
+g ceiling
+usemtl ceiling
+f -1 -2 -3 -4
+
+## Object backwall
+v  -0.99  0.00  -1.04
 v   1.00  0.00  -1.04
 v   1.00  1.99  -1.04
 v  -1.02  1.99  -1.04
@@ -40,6 +60,16 @@ v  -1.02  1.99  -1.04
 g backWall
 usemtl backWall
 f -4 -3 -2 -1
+
+## Object backwall Back
+v  -0.99  0.00  -1.04
+v   1.00  0.00  -1.04
+v   1.00  1.99  -1.04
+v  -1.02  1.99  -1.04
+
+g backWall
+usemtl backWall
+f -1 -2 -3 -4
 
 ## Object rightwall 
 v	1.00  0.00  -1.04   
@@ -51,6 +81,16 @@ g rightWall
 usemtl rightWall
 f -4 -3 -2 -1
 
+## Object rightWall Back
+v	1.00  0.00  -1.04
+v	1.00  0.00   0.99
+v	1.00  1.99   0.99
+v	1.00  1.99  -1.04
+
+g rightWall Back
+usemtl rightWall
+f -1 -2 -3 -4
+
 ## Object leftWall   
 v  -1.01  0.00   0.99
 v  -0.99  0.00  -1.04
@@ -60,6 +100,16 @@ v  -1.02  1.99   0.99
 g leftWall
 usemtl leftWall
 f -4 -3 -2 -1
+
+## Object leftWall Back
+v  -1.01  0.00   0.99
+v  -0.99  0.00  -1.04
+v  -1.02  1.99  -1.04
+v  -1.02  1.99   0.99
+
+g leftWall Back
+usemtl leftWall
+f -1 -2 -3 -4
 
 ## Object shortBox 
 usemtl shortBox

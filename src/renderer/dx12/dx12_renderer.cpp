@@ -375,7 +375,8 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 	pso_desc.SampleMask = UINT_MAX;
 	pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pso_desc.NumRenderTargets = 1;
-	pso_desc.RTVFormats[0] = DXGI_FORMAT_D32_FLOAT;
+	pso_desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	pso_desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	pso_desc.SampleDesc.Count = 1;
 
 	THROW_IF_FAILED(device->CreateGraphicsPipelineState(
