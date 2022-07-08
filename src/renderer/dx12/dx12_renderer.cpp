@@ -36,6 +36,14 @@ void cg::renderer::dx12_renderer::init()
 	scissor_rect = CD3DX12_RECT(0, 0,
 								static_cast<LONG>(settings->width),
 								static_cast<LONG>(settings->height));
+
+	cb.light.position = float4 {
+			settings->camera_position[0],
+			settings->camera_position[1],
+			settings->camera_position[2],
+			1.0f};
+
+	cb.light.color = float4{0.7f, 0.0f, 0.7f, 1.0f};
 	load_pipeline();
 	load_assets();
 }
@@ -186,9 +194,9 @@ void cg::renderer::dx12_renderer::create_depth_buffer()
 			&depth_buffer_desc,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE,
 			&depth_clear_value,
-			IID_PPV_ARGS(&depth_buffer)))
+			IID_PPV_ARGS(&depth_buffer)));
 
-	depth_buffer->SetName(L"Depth buffer");
+	depth_buffer->SetName(L"Depth Buffer");
 	dsv_heap.create_heap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	device->CreateDepthStencilView(
 			depth_buffer.Get(),
@@ -257,7 +265,7 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 				   D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
 	root_parameters[0].InitAsDescriptorTable(
 			1, &ranges[0],
-			D3D12_SHADER_VISIBILITY_VERTEX);
+			D3D12_SHADER_VISIBILITY_ALL);
 
 	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 				   1,
@@ -265,7 +273,7 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 				   0,
 				   D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
 	root_parameters[1].InitAsDescriptorTable(
-			1, &ranges[0],
+			1, &ranges[1],
 			D3D12_SHADER_VISIBILITY_PIXEL);
 
 
@@ -288,7 +296,7 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 			_countof(root_parameters),
 			root_parameters,
 			num_sampler_descriptors,
-			nullptr,
+			sampler_descriptors,
 			rs_flags);
 	ComPtr<ID3DBlob> signature;
 	ComPtr<ID3DBlob> error;
@@ -405,6 +413,10 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 	pso_desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	pso_desc.SampleDesc.Count = 1;
 
+	THROW_IF_FAILED(device->CreateGraphicsPipelineState(
+			&pso_desc,
+			IID_PPV_ARGS(&pipeline_state)));
+
 	ComPtr<ID3DBlob> pixel_shader_texture = compile_shader(
 			get_shader_path(shader_name),
 			"PSMain_texture",
@@ -504,6 +516,7 @@ void cg::renderer::dx12_renderer::create_shader_resource_view(const ComPtr<ID3D1
 	srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srv_desc.Texture2D.MipLevels = 1;
+	device->CreateShaderResourceView(texture.Get(), &srv_desc, cpu_handler);
 }
 
 void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D12Resource>& buffer, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handler)
@@ -518,7 +531,7 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 void cg::renderer::dx12_renderer::load_assets()
 {
 	D3D12_STATIC_SAMPLER_DESC sampler_desc = get_sampler_descriptor();
-	create_root_signature(nullptr, 1);
+	create_root_signature(&sampler_desc, 1);
 	create_pso("shaders.hlsl");
 	create_command_allocators();
 	create_command_list();
@@ -611,7 +624,7 @@ void cg::renderer::dx12_renderer::load_assets()
 		texture_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		texture_desc.Width = tex_width;
 		texture_desc.Height = tex_height;
-		texture_desc.DepthOrArraySize = 0;
+		texture_desc.DepthOrArraySize = 1;
 		texture_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		texture_desc.SampleDesc.Count = 1;
 		texture_desc.SampleDesc.Quality = 0;
