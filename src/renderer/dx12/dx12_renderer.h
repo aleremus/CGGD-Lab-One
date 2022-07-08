@@ -29,6 +29,7 @@ namespace cg::renderer
 	struct constant_buffer
 	{
 		DirectX::XMMATRIX mwpMatrix;
+		DirectX::XMMATRIX shadow_matrix;
 		light light;
 	};
 
@@ -68,6 +69,7 @@ namespace cg::renderer
 		ComPtr<ID3D12CommandAllocator> command_allocators[frame_number];
 		ComPtr<ID3D12PipelineState> pipeline_state;
 		ComPtr<ID3D12PipelineState> pipeline_state_texture;
+		ComPtr<ID3D12PipelineState> pipeline_state_shadow;
 		ComPtr<ID3D12GraphicsCommandList> command_list;
 
 		ComPtr<ID3D12RootSignature> root_signature;
@@ -87,12 +89,14 @@ namespace cg::renderer
 		std::vector<ComPtr<ID3D12Resource>> upload_textures;
 
 		ComPtr<ID3D12Resource> depth_buffer;
+		ComPtr<ID3D12Resource> shadow_map;
 
 		ComPtr<ID3D12Resource> constant_buffer;
 		UINT8* constant_buffer_data_begin;
 
 		cg::renderer::constant_buffer cb{};
 
+		std::shared_ptr<cg::world::camera> shadow_light;
 		// Synchronization objects.
 		UINT frame_index;
 		HANDLE fence_event;
